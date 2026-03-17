@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Search App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            max-width: 600px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 70%;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+        }
+        #results {
+            margin-top: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #f4f4f4;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Search Universities</h2>
+    <p>Enter a name to find universities around the world.</p>
+    
+    <input type="text" id="uniName" placeholder="e.g., Oxford">
+    <button onclick="fetchUniversities()">Search</button>
+
+    <ul id="results"></ul>
+
+    <script>
+        async function fetchUniversities() {
+            const searchQuery = document.getElementById('uniName').value;
+            const resultsList = document.getElementById('results');
+            
+            // Show loading message
+            resultsList.innerHTML = '<li>Loading...</li>';
+
+            try {
+                // Call the public API provided in your assignment
+                // Note: Using https to prevent mixed-content errors during cloud deployment
+                const response = await fetch(`http://universities.hipolabs.com/search?name=${searchQuery}`);
+                const data = await response.json();
+
+                // Clear the loading message
+                resultsList.innerHTML = '';
+
+                if (data.length === 0) {
+                    resultsList.innerHTML = '<li>No universities found. Try another name.</li>';
+                    return;
+                }
+
+                // Loop through the data and create a list item for each university
+                data.forEach(uni => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <strong>${uni.name}</strong><br>
+                        Country: ${uni.country}<br>
+                        Website: <a href="${uni.web_pages[0]}" target="_blank">${uni.web_pages[0]}</a>
+                    `;
+                    resultsList.appendChild(listItem);
+                });
+
+            } catch (error) {
+                resultsList.innerHTML = '<li>Error fetching data. Please try again later.</li>';
+                console.error("API Error:", error);
+            }
+        }
+    </script>
+</body>
+</html>
